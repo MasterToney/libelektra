@@ -60,21 +60,22 @@ For the [validation plugin](../../src/plugins/validation/README.md) which suppor
 command line tool [kdb vset](../help/kdb-vset.md).
 
 If you are writing validation for dozens of configuration settings, the command line might not be the most convenient way. You can also
-write specifications in any file format of your desire. Examples can be seen [here](../../examples/spec). In Elektra, all file formats
-can have metadata but some needed extra tinkering like any `yaml` parser since metadata are not natively supported. We recommend the `ini`
-file format as it natively supports metadata. So the upper example
-could be rewritten in an `ini` file in the following way:
+write specifications in any file format of your desire. Examples can be seen [here](../../examples/spec). We recommend the INI
+file format as it natively supports metadata in an easy and understandable way. So the upper example
+could be rewritten in an INI file in the following way:
 
 ```ini
 []
-mountpoint = test-specification.ni
+mountpoint = test-specification.ini
 infos/plugins = type
 
 [bool]
 type = boolean
 ```
 
-To integrate a configuration into the key database, we mount it by using the property `mountpoint` in the configuration specification.
+To integrate a configuration into the key database, we mount it by using the line `mountpoint = test-specification.ini`
+in the configuration specification at the top. This is a mandatory information for the path under which the configuration is mounted
+(also called the `parent key`).
 This will be mounted into the spec namespace with the following command:
 
 ```shell script
@@ -92,15 +93,33 @@ many other metadata such as `check/enum`. You can read all available metadata in
 so called `contract` at the beginning of each file. This contract also contains the `infos/metadata` data which lists all available
 metadatas. We recommend to look through those plugins READMEs to know how they are intended to use.
 
+As another example you may take the [range](/src/plugins/range/README.md) plugin. The `infos/metadata` show that
+`check/range` is provided by the plugin:
+
+```shell script
+kdb meta-set /tests/abc 'check/range' '1-10'
+kdb mount test.conf /tests dump range
+kdb set /tests/abc 12
+# Using name user/tests/abc
+# Sorry, module range issued the error C03200:
+# Validation Semantic: Value '12' of key 'user/tests/abc' not within range 1-10
+```
+
+You can also find all available metadata in the [METADATA.ini](/doc/METADATA.ini) file. It shows which
+values certain metadatas can take such as `check/ipaddr` only accepting either `ipv4` or `ipv6`. This can be seen
+in the `type` field. The file also shows which plugins or tools rely on this metadata such as the `check/ipaddr` is used by
+both the `network` as well as the `ipaddr` plugin. A short description as well as examples are also given the majority of the entries.
+
 ### Nice to know
 
 Many plugins write metadata with arrays in them such as the `type` plugin which allows to list all enumerations for configuration settings.
 We have a nice [tutorial](../tutorials/arrays.md) for you to get used to arrays.
 
-You can also set validation for multiple configurations settings at once by using [globbing](../../src/plugins/glob/README.md).
+You can also set validation for multiple configurations settings at once by `_` or `#`. More information can be read in the documentation
+of the [spec plugin](/src/plugins/spec/README.md).
 
-If you decide to write metadata via a file (and especially the `ini` format) you should be aware of multiline strings that can cause
+If you decide to write metadata via a file (and especially the INI format) you should be aware of multiline strings that can cause
 parsing issues. Descriptions of metadata often take up multiple lines and
-there are multiple `ini` format standards which tell you differently how to write them.
-Elektra also has two ini plugins (`ni` and `ini`) which also handle multilines differently. We recommend the `ni` plugin which also
-works correctly with our provided [examples](../../examples/spec).
+there are multiple INI format standards which tell you differently how to write them.
+Elektra also has two ini plugins (`ni` and `ini`) which also handle multilines differently. We recommend the `ni` plugin which
+does not face this problem and also works correctly with our provided [examples](../../examples/spec).
