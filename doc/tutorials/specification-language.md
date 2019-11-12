@@ -109,6 +109,7 @@ You can also find all available metadata in the [METADATA.ini](/doc/METADATA.ini
 values certain metadatas can take such as `check/ipaddr` only accepting either `ipv4` or `ipv6`. This can be seen
 in the `type` field. The file also shows which plugins or tools rely on this metadata such as the `check/ipaddr` is used by
 both the `network` as well as the `ipaddr` plugin. A short description as well as examples are also given the majority of the entries.
+For a more detailed information please visit our [metadata](../dev/metadata.md) tutorial.
 
 ### Nice to know
 
