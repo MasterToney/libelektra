@@ -24,6 +24,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
 
 add_msr_test (tutorial_arrays "${CMAKE_SOURCE_DIR}/doc/tutorials/arrays.md")
 add_msr_test (tutorial_cascading "${CMAKE_SOURCE_DIR}/doc/tutorials/cascading.md")
+add_msr_test (tutorial_specification_language "${CMAKE_SOURCE_DIR}/doc/tutorials/specification-language.md" REQUIRED_PLUGINS dump type range)
 add_msr_test (tutorial_install_config "${CMAKE_SOURCE_DIR}/doc/tutorials/install-config-files.md"
 	      REQUIRED_PLUGINS ini
 			       resolver

@@ -13,21 +13,26 @@ When you [mount](mount.md) a configuration such as `kdb mount test.conf /tests d
 There is a 5th namespace called the `spec` namespace and has a special behavior. Any validation behavior
 will be written to the `spec` namespace. You can use `meta-set` to set any metadata to the spec namespace.
 
-```shell script
+```sh
 kdb meta-set /tests/bool 'type' boolean
 ```
 
 Now you can mount a configuration under the `/tests` path and be assured that the key `bool` will
 have a boolean value validation applied:
 
-```shell script
+```sh
 # An example configuration which will by default gets mounted to the 'user' namespace
 kdb mount test.conf /tests dump type
 
 kdb set /tests/bool Batman
+# RET:5
 # Using name user/tests/bool
 # Sorry, module type issued the error C03200:
 # Validation Semantic: The value 'uaud' of key 'user/tests/bool' could not be converted into a boolean
+
+# Cleanup
+kdb umount /tests
+kdb rm -r /tests
 ```
 
 Elektra takes all configuration settings which the user or admin provides and parses it into a structured internal format.
@@ -38,15 +43,8 @@ of the KeySet depending on the metadata provided (more detail about this will co
 or errors. If any error happened, the changes of the configuration settings are not applied.
 
 E.g. you can see
-that in the upper example we also mounted the [type](/src/plugins/type/README.md) plugin for validation checks. This for example
-can check for wrong types:
-
-```shell script
-kdb meta-set /tests/bool 'type' boolean
-kdb set /tests/bool Batman
-# Sorry, module type issued the error C03200:
-# Validation Semantic: The value 'Batman' of key 'user/tests/bool' could not be converted into a boolean
-```
+that in the upper example we also mounted the [type](/src/plugins/type/README.md) plugin for validation checks. This
+allowed us to check for wrong types such as `Batman` being no valid boolean.
 
 Please note as of Elektra v0.9 you cannot add an unlimited amount of plugins. You can see if this issue
 still remains in our issue tracker([#2133](https://github.com/ElektraInitiative/libelektra/issues/2133)).
@@ -78,7 +76,7 @@ in the configuration specification at the top. This is a mandatory information f
 (also called the `parent key`).
 This will be mounted into the spec namespace with the following command:
 
-```shell script
+```bash
 kdb mount </absolute/path/to/ini/file.ini> spec/tests ni
 kdb spec-mount /tests
 ```
@@ -96,13 +94,15 @@ metadatas. We recommend to look through those plugins READMEs to know how they a
 As another example you may take the [range](/src/plugins/range/README.md) plugin. The `infos/metadata` show that
 `check/range` is provided by the plugin:
 
-```shell script
-kdb meta-set /tests/abc 'check/range' '1-10'
+```sh
 kdb mount test.conf /tests dump range
-kdb set /tests/abc 12
-# Using name user/tests/abc
+kdb set /tests/range 5
+kdb meta-set /tests/range 'check/range' '1-10'
+kdb set /tests/range 12
+# RET: 5
+# Using name user/tests/range
 # Sorry, module range issued the error C03200:
-# Validation Semantic: Value '12' of key 'user/tests/abc' not within range 1-10
+# Validation Semantic: Value '12' of key 'user/tests/range' not within range 1-10
 ```
 
 You can also find all available metadata in the [METADATA.ini](/doc/METADATA.ini) file. It shows which
@@ -110,6 +110,12 @@ values certain metadatas can take such as `check/ipaddr` only accepting either `
 in the `type` field. The file also shows which plugins or tools rely on this metadata such as the `check/ipaddr` is used by
 both the `network` as well as the `ipaddr` plugin. A short description as well as examples are also given the majority of the entries.
 For a more detailed information please visit our [metadata](../dev/metadata.md) tutorial.
+
+Don't forget to clean up your tutorial executions:
+```sh
+kdb umount /tests
+kdb rm -r /tests
+```
 
 ### Nice to know
 
