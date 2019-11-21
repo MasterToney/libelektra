@@ -112,6 +112,7 @@ both the `network` as well as the `ipaddr` plugin. A short description as well a
 For a more detailed information please visit our [metadata](../dev/metadata.md) tutorial.
 
 Don't forget to clean up your tutorial executions:
+
 ```sh
 kdb umount /tests
 kdb rm -r /tests
